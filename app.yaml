@@ -1,0 +1,13 @@
+name: glamcart-frontend
+services:
+  - name: frontend
+    github:
+      repo: YOUR_USERNAME/glamcart-frontend
+      branch: main
+    build_command: npm install && npm run build
+    run_command: npm start
+    http_port: 3000
+    source_dir: ./
+    envs:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://glamcart-backend.ondigitalocean.app
