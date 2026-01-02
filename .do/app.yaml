@@ -4,7 +4,7 @@ services:
   github:
     repo: ayeshasnoorr44/glamcart-frontend
     branch: main
-  build_command: npm ci --legacy-peer-deps && npm run build
+  build_command: npm ci && npm run build
   run_command: npm start
   http_port: 3000
   envs:
