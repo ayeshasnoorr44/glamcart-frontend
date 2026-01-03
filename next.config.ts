@@ -2,6 +2,14 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://159.89.170.225:5000/api/:path*',
+      },
+    ];
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

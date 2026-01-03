@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const isServer = typeof window === 'undefined';
+// In production client-side, we use relative paths to trigger Next.js rewrites (avoiding Mixed Content)
+// In server-side or development, we use the full URL
+const API_BASE_URL = isServer 
+  ? (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000')
+  : (process.env.NODE_ENV === 'production' ? '' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'));
 
 // Create axios instance
 const api = axios.create({
