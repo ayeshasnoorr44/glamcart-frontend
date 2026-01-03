@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Search, ShoppingBag, Sparkles, User } from "lucide-react";
+import { Menu, Search, ShoppingBag, Sparkles, User, LogOut } from "lucide-react";
 import { useCart } from "@/context/cart-context";
+import { logout, getUser } from "@/lib/auth";
 
 const navLinks = [
   { href: "/products", label: "Shop" },
@@ -14,7 +16,14 @@ const navLinks = [
 
 export function Header() {
   const { cart } = useCart();
+  const [user, setUser] = useState<any>(null);
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  useEffect(() => {
+    // Get user from localStorage on mount
+    const userData = getUser();
+    setUser(userData);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-lg">
@@ -41,9 +50,28 @@ export function Header() {
           <Button variant="ghost" size="icon" aria-label="Search">
             <Search className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" aria-label="User profile">
-            <User className="h-5 w-5" />
-          </Button>
+          {user ? (
+            <>
+              <div className="text-sm hidden md:block text-muted-foreground">
+                {user.name}
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={logout}
+                aria-label="Logout"
+                title="Logout"
+              >
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </>
+          ) : (
+            <Button asChild variant="ghost" size="icon" aria-label="Login">
+              <Link href="/login">
+                <User className="h-5 w-5" />
+              </Link>
+            </Button>
+          )}
           <Button asChild variant="ghost" size="icon" className="relative" aria-label="Shopping cart">
             <Link href="/cart">
               <ShoppingBag className="h-5 w-5" />
