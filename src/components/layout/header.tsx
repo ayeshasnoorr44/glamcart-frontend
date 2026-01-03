@@ -9,8 +9,7 @@ import { useCart } from "@/context/cart-context";
 const navLinks = [
   { href: "/products", label: "Shop" },
   { href: "/try-on", label: "Virtual Try-On" },
-  { href: "/stylist", label: "AI Stylist" },
-  { href: "/backend", label: "Backend" },
+  { href: "/cart", label: "Cart" },
 ];
 
 export function Header() {
