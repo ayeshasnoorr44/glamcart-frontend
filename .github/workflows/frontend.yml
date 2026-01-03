@@ -40,7 +40,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Deploy to DigitalOcean App Platform
-        uses: digitalocean/app_action@v1.1.4
+        uses: digitalocean/app_action@v1.1.5
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           app_name: "clownfish-app"
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
