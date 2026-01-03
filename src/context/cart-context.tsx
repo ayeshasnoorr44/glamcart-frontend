@@ -8,7 +8,7 @@ export type CartItem = {
   product: Product;
   selectedColor: ProductColor;
   quantity: number;
-  id: string; // combination of product.id and color.hex
+  id: string; // combination of product._id and color.hex
 };
 
 type CartState = {
@@ -35,7 +35,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_ITEM': {
       const { product, color, quantity } = action.payload;
-      const cartItemId = `${product.id}-${color.hex}`;
+      const cartItemId = `${product._id || product.id}-${color.hex}`;
       const existingItem = state.cart.find(item => item.id === cartItemId);
       if (existingItem) {
         return {
