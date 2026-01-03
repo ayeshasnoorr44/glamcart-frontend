@@ -1,6 +1,6 @@
 # Glamcart Frontend
 
-Next.js 15 + React 19 application for the Glamcart virtual try-on platform. Features product browsing, virtual lipstick try-on with image upload, and shopping cart management.
+Next.js 15 + React 19 application for the Glamcart virtual try-on platform. Features product browsing, virtual lipstick try-on with image upload, and shopping cart managements.
 
 ## 🚀 Quick Start
 
