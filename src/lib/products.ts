@@ -6,17 +6,20 @@ export type ProductColor = {
 };
 
 export type Product = {
-  id: string;
+  _id?: string;
+  id?: string;
   name: string;
-  brand: 'YSL' | 'Dior' | 'Giorgio Armani' | 'Charlotte Tilbury';
-  category: 'Lipstick' | 'Eyeshadow';
+  brand: string;
+  category: string;
   price: number;
   description: string;
   colors: ProductColor[];
   rating: number;
-  reviewCount: number;
-  imageUrl: string;
-  imageHint: string;
+  reviewCount?: number;
+  reviews?: number;
+  imageUrl?: string;
+  imageHint?: string;
+  stock?: number;
 };
 
 const findImage = (id: string) => {

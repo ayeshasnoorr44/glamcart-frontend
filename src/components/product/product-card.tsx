@@ -10,15 +10,18 @@ type ProductCardProps = {
 };
 
 export function ProductCard({ product }: ProductCardProps) {
+  const productId = product.id ?? product._id ?? '';
+  const imageUrl = product.imageUrl ?? 'https://picsum.photos/seed/fallback-product/800/800';
+  const imageHint = product.imageHint ?? 'Product photo';
   return (
     <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg">
-      <Link href={`/products/${product.id}`} className="flex flex-col h-full">
+      <Link href={`/products/${productId}`} className="flex flex-col h-full">
         <CardHeader className="p-0">
           <div className="aspect-square relative w-full">
             <Image
-              src={product.imageUrl}
+              src={imageUrl}
               alt={product.name}
-              data-ai-hint={product.imageHint}
+              data-ai-hint={imageHint}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"

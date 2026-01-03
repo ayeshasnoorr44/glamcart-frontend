@@ -2,25 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { ProductCard } from './product-card';
+import type { Product } from '@/lib/products';
 import { productsAPI } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
-
-interface Product {
-  _id: string;
-  name: string;
-  brand: string;
-  description: string;
-  price: number;
-  colors: Array<{
-    name: string;
-    hex: string;
-    imageUrl?: string;
-  }>;
-  category: string;
-  stock: number;
-  rating: number;
-  reviews: number;
-}
 
 type ProductGridProps = {
   products?: Product[];
@@ -45,18 +29,21 @@ export function ProductGrid({ products: initialProducts }: ProductGridProps) {
           setProducts([
             {
               _id: '1',
+              id: '1',
               name: 'Rouge Volupté',
-              brand: 'Yves Saint Laurent',
+              brand: 'YSL',
               description: 'Creamy, moisturizing lipstick',
               price: 38,
               colors: [
                 { name: 'Beige Trench', hex: '#C4A69D' },
                 { name: 'Rouge Volupté', hex: '#D4486B' }
               ],
-              category: 'lipstick',
-              stock: 20,
+              category: 'Lipstick',
               rating: 4.8,
-              reviews: 143
+              reviewCount: 143,
+              stock: 20,
+              imageUrl: 'https://picsum.photos/seed/fallback-lipstick/800/800',
+              imageHint: 'Fallback product photo'
             }
           ]);
         } finally {
