@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import type { Product } from '@/lib/products';
 import { brands as allBrands, categories as allCategories } from '@/lib/products';
+import { productsAPI } from '@/lib/api';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -18,17 +18,54 @@ import {
 } from "@/components/ui/accordion"
 import { Button } from '../ui/button';
 
+interface Product {
+  _id: string;
+  name: string;
+  brand: string;
+  description: string;
+  price: number;
+  colors: Array<{
+    name: string;
+    hex: string;
+    imageUrl?: string;
+  }>;
+  category: string;
+  stock: number;
+  rating: number;
+  reviews: number;
+}
 
 type ProductFiltersProps = {
-  allProducts: Product[];
+  allProducts?: Product[];
 };
 
-export function ProductFilters({ allProducts }: ProductFiltersProps) {
+export function ProductFilters({ allProducts: initialProducts }: ProductFiltersProps) {
   const searchParams = useSearchParams();
+  const [allProducts, setAllProducts] = useState<Product[]>(initialProducts || []);
+  const [loading, setLoading] = useState(!initialProducts);
   const [categories, setCategories] = useState<string[]>(searchParams.get('category') ? [searchParams.get('category')!] : []);
   const [brands, setBrands] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number]>([200]);
   const [rating, setRating] = useState<number>(0);
+
+  useEffect(() => {
+    if (!initialProducts) {
+      const fetchProducts = async () => {
+        try {
+          setLoading(true);
+          const response = await productsAPI.getAll();
+          setAllProducts(response.data.data || []);
+        } catch (error) {
+          console.error('Failed to fetch products:', error);
+          setAllProducts([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchProducts();
+    }
+  }, [initialProducts]);
 
   const filteredProducts = useMemo(() => {
     return allProducts.filter(product => {
