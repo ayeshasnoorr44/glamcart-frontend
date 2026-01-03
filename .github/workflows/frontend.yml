@@ -43,7 +43,7 @@ jobs:
         uses: digitalocean/app_action@v1.1.4
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          app_name: glamcart-frontend
+          app_id: "c524183a-0789-41e6-8e40-78c73f61f9d3"
           config: app.yaml
           images: |
             [
