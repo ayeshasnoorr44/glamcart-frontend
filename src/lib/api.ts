@@ -3,10 +3,14 @@ import axios from 'axios';
 // Always use the full backend URL for both server and client
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-// Create axios instance
+// Create axios instance with CORS-compatible settings
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000, // 30 seconds for image processing
+  withCredentials: false, // Don't send credentials for CORS requests (unless needed)
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
 // Request interceptor for logging
