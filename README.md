@@ -4,7 +4,7 @@ Next.js 15 + React 19 application for the Glamcart virtual try-on platform. Feat
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Prerequisitess
 - Node.js 18+
 - Backend API running on `http://localhost:5000`
 
