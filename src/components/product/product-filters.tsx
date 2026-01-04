@@ -54,7 +54,8 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
         try {
           setLoading(true);
           const response = await productsAPI.getAll();
-          setAllProducts(response.data.data || []);
+          // Backend returns { success, count, data: [...] }
+          setAllProducts(response.data.data || response.data || []);
         } catch (error) {
           console.error('Failed to fetch products:', error);
           setAllProducts([]);
