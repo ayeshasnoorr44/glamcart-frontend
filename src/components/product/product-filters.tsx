@@ -55,7 +55,10 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
           setLoading(true);
           const response = await productsAPI.getAll();
           // Backend returns { success, count, data: [...] }
-          setAllProducts(response.data.data || response.data || []);
+          // axios wraps response in response.data, so we need response.data.data
+          const products = response.data?.data || [];
+          console.log('Fetched products:', products);
+          setAllProducts(products);
         } catch (error) {
           console.error('Failed to fetch products:', error);
           setAllProducts([]);
@@ -180,7 +183,7 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
       </aside>
 
       <main className="lg:col-span-3">
-        <ProductGrid products={filteredProducts} />
+        <ProductGrid products={filteredProducts} loading={loading} />
       </main>
     </div>
   );
