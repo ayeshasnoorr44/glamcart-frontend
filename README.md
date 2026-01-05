@@ -85,4 +85,4 @@ docker run -p 3000:3000 \
 - **CI/CD**: GitHub Actions (automatic deployment on push to main)
 - **Environment Variables**: Set in DigitalOcean dashboard
 
-See the main README for full setup instructions.
+See the main README for full setup instructions and test
