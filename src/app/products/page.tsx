@@ -26,7 +26,7 @@ function ProductsPageContent() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://159.89.170.225:5000';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://clownfish-app-pn8ie.ondigitalocean.app';
         const response = await fetch(`${apiUrl}/api/products`);
         const data = await response.json();
         
