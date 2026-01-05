@@ -9,6 +9,6 @@ services:
   http_port: 3000
   envs:
   - key: NEXT_PUBLIC_API_URL
-    value: http://159.89.170.225:5000
+    value: https://clownfish-app-pn8ie.ondigitalocean.app
   - key: NODE_ENV
     value: production

@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://159.89.170.225:5000/api/:path*',
+        destination: 'https://clownfish-app-pn8ie.ondigitalocean.app/api/:path*',
       },
     ];
   },
