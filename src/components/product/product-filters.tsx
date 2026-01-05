@@ -47,6 +47,7 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
   const [brands, setBrands] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number]>([200]);
   const [rating, setRating] = useState<number>(0);
+  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '');
 
   useEffect(() => {
     if (!initialProducts) {
@@ -71,15 +72,22 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
     }
   }, [initialProducts]);
 
+  // Update search query when URL params change
+  useEffect(() => {
+    const newSearchQuery = searchParams.get('search') || '';
+    setSearchQuery(newSearchQuery);
+  }, [searchParams]);
+
   const filteredProducts = useMemo(() => {
     return allProducts.filter(product => {
       const categoryMatch = categories.length === 0 || categories.includes(product.category);
       const brandMatch = brands.length === 0 || brands.includes(product.brand);
       const priceMatch = product.price <= priceRange[0];
       const ratingMatch = product.rating >= rating;
-      return categoryMatch && brandMatch && priceMatch && ratingMatch;
+      const searchMatch = !searchQuery || product.name.toLowerCase().includes(searchQuery.toLowerCase()) || product.brand.toLowerCase().includes(searchQuery.toLowerCase());
+      return categoryMatch && brandMatch && priceMatch && ratingMatch && searchMatch;
     });
-  }, [allProducts, categories, brands, priceRange, rating]);
+  }, [allProducts, categories, brands, priceRange, rating, searchQuery]);
   
   const handleCategoryChange = (category: string) => {
     setCategories(prev => 

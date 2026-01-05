@@ -2,11 +2,41 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Menu, Search, ShoppingBag, Sparkles, User, LogOut } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { logout, getUser } from "@/lib/auth";
+
+function SearchBar() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchTerm)}`);
+      setSearchTerm('');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSearch} className="hidden md:flex items-center gap-2">
+      <Input
+        type="text"
+        placeholder="Search products..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-48 h-8"
+      />
+      <Button type="submit" variant="ghost" size="icon" aria-label="Search">
+        <Search className="h-5 w-5" />
+      </Button>
+    </form>
+  );
+}
 
 const navLinks = [
   { href: "/products", label: "Shop" },
@@ -47,11 +77,7 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" aria-label="Search">
-            <Link href="/products">
-              <Search className="h-5 w-5" />
-            </Link>
-          </Button>
+          <SearchBar />
           {user ? (
             <>
               <div className="text-sm hidden md:block text-muted-foreground">

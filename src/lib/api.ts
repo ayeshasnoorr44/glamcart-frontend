@@ -3,6 +3,11 @@ import axios from 'axios';
 // Always use the full backend URL for both server and client
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+// Log the API URL being used (for debugging)
+if (typeof window !== 'undefined') {
+  console.log('🔗 API Base URL:', API_BASE_URL);
+}
+
 // Create axios instance with CORS-compatible settings
 const api = axios.create({
   baseURL: API_BASE_URL,
