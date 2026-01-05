@@ -47,8 +47,10 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" aria-label="Search">
-            <Search className="h-5 w-5" />
+          <Button asChild variant="ghost" size="icon" aria-label="Search">
+            <Link href="/products">
+              <Search className="h-5 w-5" />
+            </Link>
           </Button>
           {user ? (
             <>

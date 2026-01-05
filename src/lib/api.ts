@@ -47,6 +47,12 @@ export const productsAPI = {
 
   create: (product: any) =>
     api.post('/api/products', product),
+
+  update: (id: string, product: any) =>
+    api.put(`/api/products/${id}`, product),
+
+  delete: (id: string) =>
+    api.delete(`/api/products/${id}`),
 };
 
 export const tryOnAPI = {

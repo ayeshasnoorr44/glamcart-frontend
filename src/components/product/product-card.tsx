@@ -11,7 +11,8 @@ type ProductCardProps = {
 
 export function ProductCard({ product }: ProductCardProps) {
   const productId = product.id ?? product._id ?? '';
-  const imageUrl = product.imageUrl ?? 'https://picsum.photos/seed/fallback-product/800/800';
+  const imageUrl = product.imageUrl ?? product.imageHint ?? 'https://picsum.photos/seed/fallback-product/800/800';
+  console.log('ProductCard - Product:', product.name, 'ImageURL:', imageUrl);
   const imageHint = product.imageHint ?? 'Product photo';
   return (
     <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg">
