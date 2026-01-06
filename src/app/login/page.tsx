@@ -36,19 +36,32 @@ export default function LoginPage() {
       const response = await api.post(endpoint, formData);
 
       if (response.data.success) {
-        // Save token to localStorage
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.data));
+        console.log('✅ Auth successful:', response.data);
+        
+        // Save token and user to localStorage
+        const token = response.data.token;
+        const userData = response.data.data;
+        
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(userData));
+        
+        console.log('✅ Token and user saved to localStorage');
 
         toast({
           title: 'Success',
-          description: isRegister ? 'Account created successfully!' : 'Login successful!',
+          description: isRegister 
+            ? `Welcome ${userData.name}! Account created successfully!` 
+            : `Welcome back ${userData.name}!`,
         });
 
-        // Redirect to products page
-        router.push('/products');
+        // Dispatch storage event to notify other components (like Header)
+        window.dispatchEvent(new Event('user-logged-in'));
+        
+        // Redirect to home page or products
+        router.push('/');
       }
     } catch (error: any) {
+      console.error('Auth error:', error);
       toast({
         title: 'Error',
         description: error.response?.data?.message || 'Authentication failed',
