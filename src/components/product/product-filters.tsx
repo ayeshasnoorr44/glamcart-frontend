@@ -2,8 +2,6 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { brands as allBrands, categories as allCategories } from '@/lib/products';
-import { productsAPI } from '@/lib/api';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -20,19 +18,22 @@ import { Button } from '../ui/button';
 
 interface Product {
   _id: string;
+  id?: string;
   name: string;
   brand: string;
   description: string;
   price: number;
-  colors: Array<{
+  imageUrl?: string;
+  colors?: Array<{
     name: string;
     hex: string;
     imageUrl?: string;
   }>;
   category: string;
-  stock: number;
+  stock?: number;
   rating: number;
-  reviews: number;
+  reviewCount?: number;
+  reviews?: number;
 }
 
 type ProductFiltersProps = {
@@ -43,12 +44,17 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
   const searchParams = useSearchParams();
   const [allProducts, setAllProducts] = useState<Product[]>(initialProducts || []);
   const [loading, setLoading] = useState(!initialProducts);
-  const [categories, setCategories] = useState<string[]>(searchParams.get('category') ? [searchParams.get('category')!] : []);
-  const [brands, setBrands] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number]>([200]);
-  const [rating, setRating] = useState<number>(0);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [availableBrands, setAvailableBrands] = useState<string[]>([]);
+  
+  // Filter states
+  const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get('category') || '');
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number]>([500]);
+  const [minRating, setMinRating] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('search') || '');
 
+  // Fetch all products from API
   useEffect(() => {
     if (!initialProducts) {
       const fetchProducts = async () => {
@@ -56,26 +62,25 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
           setLoading(true);
           const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://glamcart-api.ddns.net';
           
-          // Build query string with category if provided
-          const queryParams = new URLSearchParams();
-          if (categories.length > 0) {
-            queryParams.append('category', categories[0]); // Backend filters by single category
-          }
-          if (searchQuery) {
-            queryParams.append('search', searchQuery);
-          }
-          
-          const queryString = queryParams.toString();
-          const url = `${apiUrl}/api/products${queryString ? '?' + queryString : ''}`;
-          console.log('Fetching products from:', url);
-          
-          const response = await fetch(url);
+          // Always fetch ALL products first to build filter options
+          const response = await fetch(`${apiUrl}/api/products`);
           const data = await response.json();
           const products = data.data || [];
-          console.log(`✅ Fetched ${products.length} products`, products);
+          console.log(`✅ Fetched ${products.length} total products from API`);
+          
           setAllProducts(products);
+          
+          // Extract unique categories and brands from fetched products
+          const uniqueCategories = [...new Set(products.map((p: Product) => p.category))].filter(Boolean).sort();
+          const uniqueBrands = [...new Set(products.map((p: Product) => p.brand))].filter(Boolean).sort();
+          
+          console.log('Available categories:', uniqueCategories);
+          console.log('Available brands:', uniqueBrands);
+          
+          setAvailableCategories(uniqueCategories);
+          setAvailableBrands(uniqueBrands);
         } catch (error) {
-          console.error('Failed to fetch products:', error);
+          console.error('❌ Failed to fetch products:', error);
           setAllProducts([]);
         } finally {
           setLoading(false);
@@ -83,48 +88,84 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
       };
 
       fetchProducts();
+    } else {
+      // If initial products provided, extract categories and brands from them
+      const uniqueCategories = [...new Set(initialProducts.map((p: Product) => p.category))].filter(Boolean).sort();
+      const uniqueBrands = [...new Set(initialProducts.map((p: Product) => p.brand))].filter(Boolean).sort();
+      setAvailableCategories(uniqueCategories);
+      setAvailableBrands(uniqueBrands);
     }
-  }, [initialProducts, categories, searchQuery]);
+  }, [initialProducts]);
 
-  // Update search query when URL params change
-  useEffect(() => {
-    const newSearchQuery = searchParams.get('search') || '';
-    setSearchQuery(newSearchQuery);
-  }, [searchParams]);
-
+  // Apply all filters
   const filteredProducts = useMemo(() => {
-    return allProducts.filter(product => {
-      const categoryMatch = categories.length === 0 || categories.includes(product.category);
-      const brandMatch = brands.length === 0 || brands.includes(product.brand);
-      const priceMatch = product.price <= priceRange[0];
-      const ratingMatch = product.rating >= rating;
-      const searchMatch = !searchQuery || product.name.toLowerCase().includes(searchQuery.toLowerCase()) || product.brand.toLowerCase().includes(searchQuery.toLowerCase());
-      return categoryMatch && brandMatch && priceMatch && ratingMatch && searchMatch;
+    console.log('Filtering with:', { selectedCategory, selectedBrands, priceRange, minRating, searchQuery });
+    
+    const filtered = allProducts.filter(product => {
+      // Category filter (case-insensitive)
+      if (selectedCategory) {
+        if (product.category.toLowerCase() !== selectedCategory.toLowerCase()) {
+          return false;
+        }
+      }
+      
+      // Brand filter
+      if (selectedBrands.length > 0) {
+        if (!selectedBrands.includes(product.brand)) {
+          return false;
+        }
+      }
+      
+      // Price filter
+      if (product.price > priceRange[0]) {
+        return false;
+      }
+      
+      // Rating filter
+      if (product.rating < minRating) {
+        return false;
+      }
+      
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        if (!product.name.toLowerCase().includes(query) && !product.brand.toLowerCase().includes(query)) {
+          return false;
+        }
+      }
+      
+      return true;
     });
-  }, [allProducts, categories, brands, priceRange, rating, searchQuery]);
-  
-  const handleCategoryChange = (category: string) => {
-    setCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  };
+    
+    console.log(`✅ After filtering: ${filtered.length} products`);
+    return filtered;
+  }, [allProducts, selectedCategory, selectedBrands, priceRange, minRating, searchQuery]);
   
   const handleBrandChange = (brand: string) => {
-    setBrands(prev => 
+    setSelectedBrands(prev => 
       prev.includes(brand) 
         ? prev.filter(b => b !== brand)
         : [...prev, brand]
     );
   };
 
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(selectedCategory === category ? '' : category);
+  };
+
   const clearFilters = () => {
-    setCategories([]);
-    setBrands([]);
-    setPriceRange([200]);
-    setRating(0);
-  }
+    setSelectedCategory('');
+    setSelectedBrands([]);
+    setPriceRange([500]);
+    setMinRating(0);
+    setSearchQuery('');
+  };
+
+  // Get max price from products for slider
+  const maxPrice = useMemo(() => {
+    if (allProducts.length === 0) return 500;
+    return Math.ceil(Math.max(...allProducts.map(p => p.price)) / 10) * 10;
+  }, [allProducts]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -135,42 +176,62 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
             <Button variant="ghost" size="sm" onClick={clearFilters}>Clear All</Button>
           </div>
           <Accordion type="multiple" defaultValue={['category', 'brand', 'price', 'rating']} className="w-full">
+            {/* Category Filter */}
             <AccordionItem value="category">
               <AccordionTrigger className="text-base">Category</AccordionTrigger>
               <AccordionContent>
                 <div className="space-y-2 pt-2">
-                  {allCategories.map(category => (
-                    <div key={category} className="flex items-center space-x-2">
-                      <Checkbox id={`cat-${category}`} checked={categories.includes(category)} onCheckedChange={() => handleCategoryChange(category)} />
-                      <Label htmlFor={`cat-${category}`} className="font-normal">{category}</Label>
-                    </div>
-                  ))}
+                  {availableCategories.length > 0 ? (
+                    availableCategories.map(category => (
+                      <div key={category} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`cat-${category}`} 
+                          checked={selectedCategory === category}
+                          onCheckedChange={() => handleCategoryChange(category)}
+                        />
+                        <Label htmlFor={`cat-${category}`} className="font-normal">{category}</Label>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Loading categories...</p>
+                  )}
                 </div>
               </AccordionContent>
             </AccordionItem>
 
+            {/* Brand Filter */}
             <AccordionItem value="brand">
               <AccordionTrigger className="text-base">Brand</AccordionTrigger>
               <AccordionContent>
                 <div className="space-y-2 pt-2">
-                  {allBrands.map(brand => (
-                    <div key={brand} className="flex items-center space-x-2">
-                      <Checkbox id={`brand-${brand}`} checked={brands.includes(brand)} onCheckedChange={() => handleBrandChange(brand)} />
-                      <Label htmlFor={`brand-${brand}`} className="font-normal">{brand}</Label>
-                    </div>
-                  ))}
+                  {availableBrands.length > 0 ? (
+                    availableBrands.map(brand => (
+                      <div key={brand} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`brand-${brand}`} 
+                          checked={selectedBrands.includes(brand)}
+                          onCheckedChange={() => handleBrandChange(brand)}
+                        />
+                        <Label htmlFor={`brand-${brand}`} className="font-normal">{brand}</Label>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Loading brands...</p>
+                  )}
                 </div>
               </AccordionContent>
             </AccordionItem>
 
+            {/* Price Filter */}
             <AccordionItem value="price">
               <AccordionTrigger className="text-base">Price Range</AccordionTrigger>
               <AccordionContent>
                 <div className="pt-4">
                   <Slider
-                    defaultValue={[200]}
-                    max={200}
-                    step={10}
+                    value={priceRange}
+                    max={maxPrice}
+                    min={0}
+                    step={5}
                     onValueChange={(value) => setPriceRange(value as [number])}
                   />
                   <div className="flex justify-between text-sm text-muted-foreground mt-2">
@@ -181,10 +242,11 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
               </AccordionContent>
             </AccordionItem>
 
+            {/* Rating Filter */}
             <AccordionItem value="rating">
               <AccordionTrigger className="text-base">Rating</AccordionTrigger>
               <AccordionContent>
-                <RadioGroup defaultValue="0" onValueChange={(value) => setRating(Number(value))} className="pt-2 space-y-1">
+                <RadioGroup value={String(minRating)} onValueChange={(value) => setMinRating(Number(value))} className="pt-2 space-y-1">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="4.5" id="r1" />
                     <Label htmlFor="r1" className="font-normal">4.5 stars & up</Label>
@@ -193,9 +255,9 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
                     <RadioGroupItem value="4" id="r2" />
                     <Label htmlFor="r2" className="font-normal">4 stars & up</Label>
                   </div>
-                   <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
                     <RadioGroupItem value="0" id="r3" />
-                    <Label htmlFor="r3" className="font-normal">Any</Label>
+                    <Label htmlFor="r3" className="font-normal">Any Rating</Label>
                   </div>
                 </RadioGroup>
               </AccordionContent>
