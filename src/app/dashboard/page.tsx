@@ -1,8 +1,11 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { isAuthenticated } from '@/lib/auth';
 import { TrendingUp, ShoppingCart, Users, DollarSign } from 'lucide-react';
 
 // Dummy sales data
@@ -40,6 +43,18 @@ const metrics = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      router.push('/login');
+    }
+  }, [router]);
+
+  if (!isAuthenticated()) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/5 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
