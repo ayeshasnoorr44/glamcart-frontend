@@ -20,8 +20,8 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Shop</h3>
             <ul className="space-y-2">
-              <li><Link href="/products?category=Lipstick" className="text-sm text-muted-foreground hover:text-primary">Lipsticks</Link></li>
-              <li><Link href="/products?category=Eyeshadow" className="text-sm text-muted-foreground hover:text-primary">Eyeshadows</Link></li>
+              <li><Link href="/products?category=lipstick" className="text-sm text-muted-foreground hover:text-primary">Lipsticks</Link></li>
+              <li><Link href="/products?category=eyeshadow" className="text-sm text-muted-foreground hover:text-primary">Eyeshadows</Link></li>
               <li><Link href="/products" className="text-sm text-muted-foreground hover:text-primary">All Products</Link></li>
               <li><Link href="/brands" className="text-sm text-muted-foreground hover:text-primary">Brands</Link></li>
             </ul>

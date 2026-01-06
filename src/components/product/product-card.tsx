@@ -11,22 +11,29 @@ type ProductCardProps = {
 
 export function ProductCard({ product }: ProductCardProps) {
   const productId = product.id ?? product._id ?? '';
-  const imageUrl = product.imageUrl ?? product.imageHint ?? 'https://picsum.photos/seed/fallback-product/800/800';
-  console.log('ProductCard - Product:', product.name, 'ImageURL:', imageUrl);
+  // Ensure imageUrl is valid and not empty
+  const imageUrl = (product.imageUrl && typeof product.imageUrl === 'string' && product.imageUrl.trim() !== '')
+    ? product.imageUrl
+    : 'https://picsum.photos/seed/fallback-product/800/800';
+  console.log('ProductCard - Product:', product.name, 'ImageURL:', imageUrl, 'Full product:', product);
   const imageHint = product.imageHint ?? 'Product photo';
   return (
     <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-lg">
       <Link href={`/products/${productId}`} className="flex flex-col h-full">
         <CardHeader className="p-0">
-          <div className="aspect-square relative w-full">
+          <div className="aspect-square relative w-full overflow-hidden bg-muted">
             <Image
               src={imageUrl}
               alt={product.name}
               data-ai-hint={imageHint}
               fill
               unoptimized
-              className="object-cover"
+              className="object-cover w-full h-full"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+              onError={(e) => {
+                console.error('Image load error for:', product.name, imageUrl);
+                (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback-product/800/800';
+              }}
             />
           </div>
         </CardHeader>
