@@ -54,11 +54,25 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
       const fetchProducts = async () => {
         try {
           setLoading(true);
-          const response = await productsAPI.getAll();
-          // Backend returns { success, count, data: [...] }
-          // axios wraps response in response.data, so we need response.data.data
-          const products = response.data?.data || [];
-          console.log('Fetched products:', products);
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://glamcart-api.ddns.net';
+          
+          // Build query string with category if provided
+          const queryParams = new URLSearchParams();
+          if (categories.length > 0) {
+            queryParams.append('category', categories[0]); // Backend filters by single category
+          }
+          if (searchQuery) {
+            queryParams.append('search', searchQuery);
+          }
+          
+          const queryString = queryParams.toString();
+          const url = `${apiUrl}/api/products${queryString ? '?' + queryString : ''}`;
+          console.log('Fetching products from:', url);
+          
+          const response = await fetch(url);
+          const data = await response.json();
+          const products = data.data || [];
+          console.log(`✅ Fetched ${products.length} products`, products);
           setAllProducts(products);
         } catch (error) {
           console.error('Failed to fetch products:', error);
@@ -70,7 +84,7 @@ export function ProductFilters({ allProducts: initialProducts }: ProductFiltersP
 
       fetchProducts();
     }
-  }, [initialProducts]);
+  }, [initialProducts, categories, searchQuery]);
 
   // Update search query when URL params change
   useEffect(() => {
