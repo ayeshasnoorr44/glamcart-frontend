@@ -172,11 +172,21 @@ export function Header() {
                   <div className="px-2 py-1.5">
                     <p className="text-sm font-semibold">Welcome, {user.name}!</p>
                     <p className="text-xs text-muted-foreground">{user.email}</p>
+                    {user.role === 'admin' && (
+                      <p className="text-xs text-primary font-semibold mt-1">👑 Admin</p>
+                    )}
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
+                  {user.role === 'admin' && (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin">Admin Panel</Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link href="/cart">Shopping Cart</Link>
                   </DropdownMenuItem>

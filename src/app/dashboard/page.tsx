@@ -51,6 +51,28 @@ export default function DashboardPage() {
     }
   }, [router]);
 
+  // CSV Export Function
+  const downloadReport = () => {
+    // Create CSV header and data
+    const csvContent = [
+      ['Product', 'Brand', 'Units Sold', 'Revenue'].join(','),
+      ...productsData.map(product => 
+        [product.name, product.brand, product.sold, `$${product.revenue}`].join(',')
+      )
+    ].join('\n');
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `glamify-report-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
   if (!isAuthenticated()) {
     return null;
   }
@@ -59,9 +81,17 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/5 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-5xl font-bold font-headline mb-2">Analytics Dashboard</h1>
-          <p className="text-lg text-muted-foreground">Track your beauty brand performance in real-time</p>
+        <div className="mb-12 flex items-center justify-between">
+          <div>
+            <h1 className="text-5xl font-bold font-headline mb-2">Analytics Dashboard</h1>
+            <p className="text-lg text-muted-foreground">Track your beauty brand performance in real-time</p>
+          </div>
+          <button
+            onClick={downloadReport}
+            className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+          >
+            📊 Export Report
+          </button>
         </div>
 
         {/* Key Metrics */}
