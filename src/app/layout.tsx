@@ -1,3 +1,4 @@
+import "./globals.css"
 import Script from 'next/script'
 import { CartProvider } from '@/context/cart-context'
 
@@ -9,7 +10,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Official Microsoft Clarity Integration */}
         <Script
           id="clarity-script"
           strategy="afterInteractive"
@@ -24,7 +24,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>
+      <body className="antialiased">
         <CartProvider>
           {children}
         </CartProvider>
