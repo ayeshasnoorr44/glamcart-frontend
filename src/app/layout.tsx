@@ -1,4 +1,5 @@
 import Script from 'next/script'
+import { CartProvider } from '@/context/cart-context'
 
 export default function RootLayout({
   children,
@@ -23,7 +24,11 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <CartProvider>
+          {children}
+        </CartProvider>
+      </body>
     </html>
   )
 }
