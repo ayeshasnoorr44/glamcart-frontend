@@ -1,6 +1,8 @@
 import "./globals.css"
 import Script from 'next/script'
 import { CartProvider } from '@/context/cart-context'
+import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
 
 export default function RootLayout({
   children,
@@ -24,9 +26,13 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased">
+      <body className="antialiased min-h-screen flex flex-col">
         <CartProvider>
-          {children}
+          <Header />
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
         </CartProvider>
       </body>
     </html>
